@@ -1,36 +1,63 @@
+console.log('node says hey')
+
+const express = require('express');
+const app = express()
 require('dotenv').config();
-const express = require('express'); //import express framework
 const cors = require('cors');
-const server = express();
-const data = require('./data/weather.json');
 
-server.use(cors()); // make the server opened for any request
-
-
+app.use(cors());
 
 const PORT = process.env.PORT;
 
-server.get('/',(req,res)=>{
-    res.send("Hi from the home route");
-})
+// ------------------------------------------------------
+
+const weatherData = require('./data/weather.json');
+const { response } = require('express');
+
+app.get('/', (req, res) => {
+  res.send('Server says haaaaayyyyy');
+});
 
 app.get('/weather', (req, res) => {
-    let q = req.query.q;
+  let q = req.query.q;
     let lat = req.query.lat;
-    let lon = req.query.lon;})
+    let lon = req.query.lon;
+    console.log(q,lat,lon);
+    let location = weatherData.find(item => item["city_name"].toUpperCase() ==q.toUpperCase());
+    console.log(q)
+    console.log(lon)
+    console.log(lat)
+  
+  try{ 
+    let weather = [];
+   
+    location.data.forEach(i => {
+    weather.push(
+      new Forecast(i.datetime, `Low of ${i.low_temp}, high of ${i.max_temp}, with ${i.weather.description}`)
+    )
+  })
+  console.log(weather);
+  // res.send(weatherData.find(city => city.city_name.toLowerCase().includes(q.toLowerCase())));
+  res.send(weather)
+ }
+ catch(err){
+    console.log(err);
+ } 
+ 
 
+});
 
-server.listen(PORT, () => {
-    console.log(`Hello, I am listening on ${PORT}`);
-})
+app.get('/*', (req,res) => {
+  response.status(404).send('Sorry, route not found');
+});
 
-server.get('*', (req,res)=>{
-    res.send("page not found");
-})
-
+app.listen(PORT, () => {console.log(`listening on port ${PORT}`);});
 
 class Forecast {
-    constructor(date, description) {
-   
-    }
+  constructor(date, description) {
+    this.date = date,
+    this.description = description
   }
+}
+
+weatherData.forEach 
