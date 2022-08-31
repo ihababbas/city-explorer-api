@@ -4,7 +4,7 @@ const app = express();
 require("dotenv").config();
 const cors = require("cors");
 const axios = require("axios");
-app.use(cors({origin: "https://localhost:3000/"}));
+app.use(cors("*"));
 
 const PORT = process.env.PORT;
 
