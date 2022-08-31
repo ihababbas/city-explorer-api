@@ -38,20 +38,24 @@ const getWeather = async (req, res) => {
   }
 };
 let getMovies = async (req, res) => {
-  const cityName = req.query.cityName;
-  const Mkey = '12f58ca1d8616215ed09c24df72ebb62'
-    const URL = `https://api.themoviedb.org/3/search/movie?api_key=${Mkey}&language=en-US&query=${cityName}&page=1&include_adult=true`;
-
-    axios.get(URL).then( result => {
-        let sendData = result.data.results.map( item => {
-            return new MovieData(item);
-        })
-        return res.status(200).send(sendData);
-    }).catch(error => {
-        return res.status(404).send(error)
+  let movies = req.query.city;
+  const key = '12f58ca1d8616215ed09c24df72ebb62';
+  try{
+    let localMovies = await axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${key}&language=en-US&query=${movies}&page=1&include_adult=true`);
+    let moviesOut = [];
+    localMovies.data.results.forEach((i) => {
+      moviesOut.push( new Movie (i.title, i.overview, i.vote_average, i.vote_count, `https://image.tmdb.org/t/p/w500/${i.poster_path}`, i.popularity, i.release_date))
     })
+    res.send(moviesOut)
+    console.log(moviesOut);
+  }
+  catch(err) {
+    console.error(err.message)
+  }
 };
+
 app.get("/weather", getWeather);
+
 app.get("/movie", getMovies);
 
 app.get("/*", (req, res) => {
@@ -69,15 +73,15 @@ class Forecast {
     this.max_temp = i.max_temp;
     this.description = i.weather.description;
   }
-}
-class MovieData {
-  constructor(item) {
-    this.title = item.title;
-    this.overview = item.overview;
-    this.vote_average = item.vote_average;
-    this.vote_count = item.vote_count;
-    this.poster_path = "https://image.tmdb.org/t/p/w500/" + item.poster_path;
-    this.popularity = item.popularity;
-    this.release_date = item.release_date;
+};
+class Movie {
+  constructor(title, overview, avgVote, sumVote, imgPath, popularity, release) {
+    this.title = title,
+    this.overview = overview,
+    this.avgVote = avgVote,
+    this.sumVote = sumVote,
+    this.imgPath = imgPath,
+    this.popularity = popularity,
+    this.release = release
   }
-}
+};
