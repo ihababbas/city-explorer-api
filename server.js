@@ -23,11 +23,11 @@ app.get("/", (req, res) => {
 //app.get("/weather", getWeather);
 
 //app.get("/movie", getMovies);
-let getWeather = require('./weather')
-let getMovies = require('./movie')
-app.get('/weather', getWeather)
+const getWeather = require('./getweather')
+const getMovies = require('./getmovie')
 
-app.get('/movies', getMovies)
+app.get('/weather', getWeather)
+app.get('/movie', getMovies)
 
 app.get("/*", (req, res) => {
   response.status(404).send("Sorry, route not found");
